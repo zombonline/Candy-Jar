@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using System.Text;
 
 public class NewBehaviourScript : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class NewBehaviourScript : MonoBehaviour
 
     public TMP_InputField nameInput;
 
-    public TextMeshProUGUI highScoreText;
+    public TextMeshProUGUI highScoreText, newHighScoreText;
 
     bool highScore = false;
 
@@ -36,43 +37,49 @@ public class NewBehaviourScript : MonoBehaviour
         timer = time;
         if (PlayerPrefs.HasKey("HIGH_SCORE"))
         {
+            var formattedTimerText = (PlayerPrefs.GetFloat("HIGH_SCORE").ToString("00.00")[0]).ToString()
+                + (PlayerPrefs.GetFloat("HIGH_SCORE").ToString("00.00")[1]).ToString()
+                + ":" + (PlayerPrefs.GetFloat("HIGH_SCORE").ToString("00.00")[3]).ToString()
+                + (PlayerPrefs.GetFloat("HIGH_SCORE").ToString("00.00")[4]).ToString();
+
             highScoreText.gameObject.SetActive(true);
-            highScoreText.text = PlayerPrefs.GetString("HIGH_SCORE_NAME") + " - " + PlayerPrefs.GetFloat("HIGH_SCORE").ToString("00.00");
+            highScoreText.text = PlayerPrefs.GetString("HIGH_SCORE_NAME") + " - " + formattedTimerText;
         }
     }
 
 
     void Update()
     {
-        if(gameOver)
+        var formattedTimerText = (timer.ToString("00.00")[0]).ToString() + (timer.ToString("00.00")[1]).ToString() + ":" + (timer.ToString("00.00")[3]).ToString() + (timer.ToString("00.00")[4]).ToString();
+
+        if (gameOver)
         {
             HandleHighScoreInput();
         }
 
         if(highScore)
         {
+            newHighScoreText.gameObject.SetActive(true);
             highScoreText.gameObject.SetActive(true);
             if(nameInput.text.Length == 0)
             {
-                highScoreText.text = "___" + " - " + timer.ToString("00.00");
+                highScoreText.text = "___" + " - " + formattedTimerText;
             }
             else if(nameInput.text.Length == 1)
             {
-                highScoreText.text = nameInput.text.ToUpper() + "__" + " - " + timer.ToString("00.00");
+                highScoreText.text = nameInput.text.ToUpper() + "__" + " - " + formattedTimerText;
             }
             else if(nameInput.text.Length == 2)
             {
-                highScoreText.text = nameInput.text.ToUpper() + "_" + " - " + timer.ToString("00.00");
+                highScoreText.text = nameInput.text.ToUpper() + "_" + " - " + formattedTimerText;
             }
             else if(nameInput.text.Length == 3)
             {
-                highScoreText.text = nameInput.text.ToUpper() + " - " + timer.ToString("00.00");
-
+                highScoreText.text = nameInput.text.ToUpper() + " - " + formattedTimerText;
             }
-
         }
 
-        timerText.text = timer.ToString("00.00");
+        timerText.text = formattedTimerText;
 
         penaltyText.text = penaltyTimer.ToString("00.00");
 

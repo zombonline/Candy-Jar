@@ -32,6 +32,11 @@ public class NewBehaviourScript : MonoBehaviour
 
     bool highScore = false;
 
+    public AudioClip lidSound;
+    public ParticleSystem particles;
+    public Image focusScoreImage;
+    public Image enterKeySymbol;
+
     void Start()
     {
         timer = time;
@@ -59,6 +64,16 @@ public class NewBehaviourScript : MonoBehaviour
 
         if(highScore)
         {
+            focusScoreImage.enabled= true;  
+            if (nameInput.gameObject.active)
+            {
+                FindObjectOfType<EventSystem>().SetSelectedGameObject(nameInput.gameObject);
+                nameInput.MoveTextEnd(true);
+                if(nameInput.text.Length > 3)
+                {
+                    nameInput.text = "";
+                }
+            }
             newHighScoreText.gameObject.SetActive(true);
             highScoreText.gameObject.SetActive(true);
             if(nameInput.text.Length == 0)
@@ -75,6 +90,8 @@ public class NewBehaviourScript : MonoBehaviour
             }
             else if(nameInput.text.Length == 3)
             {
+                enterKeySymbol.enabled = true;
+
                 highScoreText.text = nameInput.text.ToUpper() + " - " + formattedTimerText;
             }
         }
@@ -150,7 +167,12 @@ public class NewBehaviourScript : MonoBehaviour
     {
         if (candy == maxCandy)
         {
-            Finish();
+            lid.SetActive(true);
+            gameOver = true;
+            AudioSource.PlayClipAtPoint(lidSound, Camera.main.transform.position);
+            particles.Play();
+            Invoke(nameof(Finish), 0.5f);
+            
 
         }
         else
@@ -197,6 +219,10 @@ public class NewBehaviourScript : MonoBehaviour
             highScore = true;
             nameInput.gameObject.SetActive(true);
             EventSystem.current.SetSelectedGameObject(nameInput.gameObject);
+        }
+        if(!highScore)
+        {
+            enterKeySymbol.enabled = true;  
         }
     }
 

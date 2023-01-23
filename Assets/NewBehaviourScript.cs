@@ -36,6 +36,7 @@ public class NewBehaviourScript : MonoBehaviour
     public ParticleSystem particles;
     public Image focusScoreImage;
     public Image enterKeySymbol;
+    public Animator finishKeySymbol;
 
     void Start()
     {
@@ -56,6 +57,16 @@ public class NewBehaviourScript : MonoBehaviour
     void Update()
     {
         var formattedTimerText = (timer.ToString("00.00")[0]).ToString() + (timer.ToString("00.00")[1]).ToString() + ":" + (timer.ToString("00.00")[3]).ToString() + (timer.ToString("00.00")[4]).ToString();
+        if (candy == maxCandy && penaltyTimer <= 0 && !gameOver)
+        {
+            finishKeySymbol.SetBool("isFinished", true);
+        }
+        else
+        {
+            finishKeySymbol.SetBool("isFinished", false);
+
+        }
+
 
         if (gameOver)
         {
@@ -114,6 +125,10 @@ public class NewBehaviourScript : MonoBehaviour
         if (timer < 0)
         {
             timer = 0;
+            gameOver = true;
+            Invoke(nameof(Finish), 0.5f);
+
+
         }
 
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
@@ -123,8 +138,15 @@ public class NewBehaviourScript : MonoBehaviour
 
         if (gameStarted)
         {
+
+            
+
             if (!gameOver)
             {
+                if(Input.GetKeyDown(KeyCode.R))
+                {
+                    SceneManager.LoadScene(0);
+                }
                 timer -= Time.deltaTime;
                 candyCount.text = candy.ToString("000") + "/" + maxCandy.ToString("000");
             }
@@ -199,15 +221,20 @@ public class NewBehaviourScript : MonoBehaviour
 
     private void Finish()
     {
-        lid.SetActive(true);
         gameOver = true;
-        candyCount.text = "COMPLETE!";
-        candyCount.GetComponent<Animator>().enabled = true;
-
-
-        if (PlayerPrefs.HasKey("HIGH_SCORE"))
+        if (lid.activeInHierarchy)
         {
-            if (timer > PlayerPrefs.GetFloat("HIGH_SCORE"))
+            candyCount.text = "COMPLETE!";
+            if (PlayerPrefs.HasKey("HIGH_SCORE"))
+            {
+                if (timer > PlayerPrefs.GetFloat("HIGH_SCORE"))
+                {
+                    highScore = true;
+                    nameInput.gameObject.SetActive(true);
+                    EventSystem.current.SetSelectedGameObject(nameInput.gameObject);
+                }
+            }
+            else
             {
                 highScore = true;
                 nameInput.gameObject.SetActive(true);
@@ -216,10 +243,13 @@ public class NewBehaviourScript : MonoBehaviour
         }
         else
         {
-            highScore = true;
-            nameInput.gameObject.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(nameInput.gameObject);
+            candyCount.text = "FAIL!";
+            highScore = false;
         }
+        candyCount.GetComponent<Animator>().enabled = true;
+
+
+        
         if(!highScore)
         {
             enterKeySymbol.enabled = true;  
